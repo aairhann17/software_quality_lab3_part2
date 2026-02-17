@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.ontariotechu.sofe3980u.BinaryAPIControllerTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.103 s - in com.ontariotechu.sofe3980u.BinaryAPIControllerTest
