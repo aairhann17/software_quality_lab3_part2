@@ -1,0 +1,89 @@
+pipeline {
+    environment {
+        PROJECT_ID = "project-ebf6c4d4-5ed4-4a81-80d"
+        REGION = "us-central1"
+        ZONE = "us-central1-a"
+        CLUSTER = "sofe3980u"
+        REPO_PATH = "us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u"
+        APP_NAME = "binarycalculatorwebapp"
+        IMAGE_TAG = "${REPO_PATH}/${APP_NAME}"
+    }
+
+    agent {
+        kubernetes {
+            label 'gcloud-agent'
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: ci
+spec:
+  serviceAccountName: jenkins-sa
+  containers:
+  - name: gcloud
+    image: google/cloud-sdk:latest
+    command:
+    - cat
+    tty: true
+"""
+        }
+    }
+
+    tools {
+        maven 'maven'
+    }
+
+    stages {
+
+        stage('test') {
+            steps {
+                sh 'mvn clean test -f ./BinaryCalculatorWebapp/pom.xml'
+            }
+        }
+
+        stage('build') {
+            steps {
+                sh 'mvn -f ./BinaryCalculatorWebapp/pom.xml -DskipTests clean package'
+            }
+        }
+
+        stage('containerize') {
+            steps {
+                container('gcloud') {
+                    dir('BinaryCalculatorWebapp') {
+                        sh """
+                            gcloud config set project ${PROJECT_ID}
+                            gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+                            gcloud builds submit --tag ${IMAGE_TAG} .
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('deploy') {
+            steps {
+                container('gcloud') {
+                    sh """
+                        gcloud config set project ${PROJECT_ID}
+                        gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE}
+                        kubectl apply -f k8s-deployment.yaml || true
+                    """
+                }
+            }
+        }
+
+        stage('service') {
+            steps {
+                container('gcloud') {
+                    sh """
+                        gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE}
+                        kubectl expose deployment binarycalculator-deployment --type=LoadBalancer --name=binarycalculator-service || true
+                        kubectl get service binarycalculator-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+                    """
+                }
+            }
+        }
+    }
+}
