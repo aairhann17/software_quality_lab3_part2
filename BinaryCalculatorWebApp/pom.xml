@@ -1,80 +1,105 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.ontariotechu.sofe3980U</groupId>
-  <artifactId>BinaryCalculatorWebapp</artifactId>
-  <packaging>war</packaging>
-  <version>1.0.0</version>
-  <name>BinaryCalculatorWebapp Maven Webapp</name>
-  <url>http://maven.apache.org</url>
-  <parent>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter-parent</artifactId>
-	<version>2.7.18</version>
-	<relativePath/> <!-- lookup parent from repository -->
-  </parent>
-  <dependencies>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-web</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-thymeleaf</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-test</artifactId>
-		<scope>test</scope>
-	</dependency>	
-	<dependency>
-		<groupId>junit</groupId>
-		<artifactId>junit</artifactId>
-		<version>4.13.2</version>
-		<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.junit.vintage</groupId>
-		<artifactId>junit-vintage-engine</artifactId>
-		<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-devtools</artifactId>
-		<optional>true</optional>
-	</dependency>
-  </dependencies>
-  <build>
-    <finalName>BinaryCalculatorWebapp</finalName>
-    <plugins>
-      <plugin>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ontariotechu.sofe3980U</groupId>
+    <artifactId>BinaryCalculatorWebapp</artifactId>
+    <version>1.0.0</version>
+    <packaging>war</packaging>
+
+    <name>BinaryCalculatorWebapp Maven Webapp</name>
+    <url>http://maven.apache.org</url>
+
+    <parent>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-		<plugin>
-		    <groupId>com.google.cloud.tools</groupId>
-		    <artifactId>jib-maven-plugin</artifactId>
-		    <version>3.4.0</version>
-		    <configuration>
-		        <from>
-		            <image>tomcat:9.0-jdk17</image>
-		        </from>
-		        <to>
-				    <image>us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp</image>
-				    <tags>
-				        <tag>${project.version}</tag>
-				        <tag>latest</tag>
-				    </tags>
-				</to>
-		        <container>
-		            <entrypoint>
-		                <arg>catalina.sh</arg>
-		                <arg>run</arg>
-		            </entrypoint>
-		            <appRoot>/usr/local/tomcat/webapps/ROOT</appRoot>
-		        </container>
-		    </configuration>
-		</plugin>
-    </plugins>
-  </build>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.18</version>
+        <relativePath/>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>BinaryCalculatorWebapp</finalName>
+
+        <plugins>
+
+            <!-- Spring Boot plugin -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- Jib plugin for container builds -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.0</version>
+
+                <configuration>
+                    <from>
+                        <image>tomcat:9.0-jdk17</image>
+                    </from>
+
+                    <to>
+                        <image>
+                            us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp
+                        </image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                            <tag>latest</tag>
+                        </tags>
+                    </to>
+
+                    <container>
+                        <entrypoint>
+                            <arg>catalina.sh</arg>
+                            <arg>run</arg>
+                        </entrypoint>
+
+                        <appRoot>/usr/local/tomcat/webapps/ROOT</appRoot>
+                    </container>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
 </project>
