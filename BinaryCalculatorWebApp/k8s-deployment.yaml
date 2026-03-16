@@ -1,19 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: binarycalculator-deployment
+  name: binarycalculatorwebapp
+  labels:
+    app: binarycalculatorwebapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: binarycalculator
+      app: binarycalculatorwebapp
   template:
     metadata:
       labels:
-        app: binarycalculator
+        app: binarycalculatorwebapp
     spec:
       containers:
-      - name: binarycalculator
-        image: IMAGE_REPLACED_BY_JENKINS
+      - name: binarycalculatorwebapp
+        image: us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp:latest
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
