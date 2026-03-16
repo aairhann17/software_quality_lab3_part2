@@ -60,8 +60,12 @@
 		            <image>tomcat:9.0-jdk17</image>
 		        </from>
 		        <to>
-		            <image>us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp</image>
-		        </to>
+				    <image>us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp</image>
+				    <tags>
+				        <tag>${project.version}</tag>
+				        <tag>latest</tag>
+				    </tags>
+				</to>
 		        <container>
 		            <entrypoint>
 		                <arg>catalina.sh</arg>
