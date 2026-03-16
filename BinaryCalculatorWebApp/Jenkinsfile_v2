@@ -15,19 +15,9 @@ spec:
     command:
     - cat
     tty: true
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:latest
-    args:
-    - --dockerfile=/workspace/Dockerfile
-    - --context=/workspace
-    - --destination=dummy-placeholder
-    - --single-snapshot
-    volumeMounts:
-    - name: workspace-volume
-      mountPath: /workspace
-  volumes:
-  - name: workspace-volume
-    emptyDir: {}
+  - name: jnlp
+    image: jenkins/inbound-agent:latest
+    args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
 """
         }
     }
@@ -63,18 +53,7 @@ spec:
                     sh """
                         gcloud config set project ${project_id}
                         gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-                    """
-                }
-
-                container('kaniko') {
-                    sh """
-                        cp -r BinaryCalculatorWebApp/* /workspace/
-
-                        /kaniko/executor \
-                          --dockerfile=/workspace/Dockerfile \
-                          --context=/workspace \
-                          --destination=us-central1-docker.pkg.dev/${project_id}/sofe3980u/binarycalculatorwebapp:latest \
-                          --single-snapshot
+                        mvn -f ./BinaryCalculatorWebApp/pom.xml jib:build
                     """
                 }
             }
