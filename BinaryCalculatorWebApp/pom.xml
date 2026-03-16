@@ -46,6 +46,18 @@
   </dependencies>
   <build>
     <finalName>BinaryCalculatorWebapp</finalName>
+	<plugins>
+    	<plugin>
+        	<groupId>com.google.cloud.tools</groupId>
+        	<artifactId>jib-maven-plugin</artifactId>
+        	<version>3.4.0</version>
+        	<configuration>
+            	<to>
+                	<image>us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp</image>
+            	</to>
+        	</configuration>
+    	</plugin>
+	</plugins>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
