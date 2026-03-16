@@ -17,6 +17,7 @@ spec:
       containers:
       - name: binarycalculatorwebapp
         image: us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         readinessProbe:
