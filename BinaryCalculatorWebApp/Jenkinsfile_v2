@@ -38,20 +38,20 @@ spec:
 
         stage('test') {
             steps {
-                sh 'mvn clean test -f ./BinaryCalculatorWebapp/pom.xml'
+                sh 'mvn clean test -f ./BinaryCalculatorWebApp/pom.xml'
             }
         }
 
         stage('build') {
             steps {
-                sh 'mvn -f ./BinaryCalculatorWebapp/pom.xml -DskipTests clean package'
+                sh 'mvn -f ./BinaryCalculatorWebApp/pom.xml -DskipTests clean package'
             }
         }
 
         stage('containerize') {
             steps {
                 container('gcloud') {
-                    dir('BinaryCalculatorWebapp') {
+                    dir('BinaryCalculatorWebApp') {
                         sh """
                             gcloud config set project ${PROJECT_ID}
                             gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
