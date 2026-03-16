@@ -1,23 +1,12 @@
 pipeline {
-    environment {
-        PROJECT_ID = "project-ebf6c4d4-5ed4-4a81-80d"
-        REGION = "us-central1"
-        ZONE = "us-central1-a"
-        CLUSTER = "sofe3980u"
-        REPO_PATH = "us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u"
-        APP_NAME = "binarycalculatorwebapp"
-        IMAGE_TAG = "${REPO_PATH}/${APP_NAME}"
-    }
-
     agent {
         kubernetes {
-            label 'gcloud-agent'
             yaml """
 apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    component: ci
+    jenkins: agent
 spec:
   serviceAccountName: jenkins-sa
   containers:
@@ -26,38 +15,61 @@ spec:
     command:
     - cat
     tty: true
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    args:
+    - --dockerfile=/workspace/Dockerfile
+    - --context=/workspace
+    - --destination=us-central1-docker.pkg.dev/${project_id}/sofe3980u/binarycalculatorwebapp:latest
+    - --single-snapshot
+    volumeMounts:
+    - name: workspace-volume
+      mountPath: /workspace
+  volumes:
+  - name: workspace-volume
+    emptyDir: {}
 """
         }
     }
 
-    tools {
-        maven 'maven'
+    environment {
+        project_id   = credentials('project_id')
+        repo_path    = credentials('repo_path')
+        cluster_name = credentials('cluster_name')
+        cluster_zone = credentials('cluster_zone')
     }
 
     stages {
 
         stage('test') {
             steps {
-                sh 'mvn clean test -f ./BinaryCalculatorWebApp/pom.xml'
+                container('gcloud') {
+                    sh 'mvn clean test -f ./BinaryCalculatorWebApp/pom.xml'
+                }
             }
         }
 
         stage('build') {
             steps {
-                sh 'mvn -f ./BinaryCalculatorWebApp/pom.xml -DskipTests clean package'
+                container('gcloud') {
+                    sh 'mvn -f ./BinaryCalculatorWebApp/pom.xml -DskipTests clean package'
+                }
             }
         }
 
         stage('containerize') {
             steps {
                 container('gcloud') {
-                    dir('BinaryCalculatorWebApp') {
-                        sh """
-                            gcloud config set project ${PROJECT_ID}
-                            gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
-                            gcloud builds submit --tag ${IMAGE_TAG} .
-                        """
-                    }
+                    sh """
+                        gcloud config set project ${project_id}
+                        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+                    """
+                }
+
+                container('kaniko') {
+                    sh """
+                        cp -r BinaryCalculatorWebApp/* /workspace/
+                    """
                 }
             }
         }
@@ -66,9 +78,11 @@ spec:
             steps {
                 container('gcloud') {
                     sh """
-                        gcloud config set project ${PROJECT_ID}
-                        gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE}
-                        kubectl apply -f k8s-deployment.yaml || true
+                        gcloud container clusters get-credentials ${cluster_name} \
+                            --zone ${cluster_zone} --project ${project_id}
+
+                        kubectl delete deployment binarycalculatorwebapp --ignore-not-found
+                        kubectl apply -f k8s-deployment.yaml
                     """
                 }
             }
@@ -78,9 +92,8 @@ spec:
             steps {
                 container('gcloud') {
                     sh """
-                        gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE}
-                        kubectl expose deployment binarycalculator-deployment --type=LoadBalancer --name=binarycalculator-service || true
-                        kubectl get service binarycalculator-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+                        kubectl apply -f k8s-service.yaml
+                        kubectl get svc binarycalculatorwebapp-service
                     """
                 }
             }
