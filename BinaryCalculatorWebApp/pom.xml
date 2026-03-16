@@ -56,20 +56,20 @@
 		    <artifactId>jib-maven-plugin</artifactId>
 		    <version>3.4.0</version>
 		    <configuration>
-        		<from>
-            		<image>tomcat:9.0-jdk17</image>
-        		</from>
-        		<to>
-            		<image>us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp</image>
-        		</to>
-				<container>
-    				<entrypoint>
-        				<arg>catalina.sh</arg>
-        				<arg>run</arg>
-    				</entrypoint>
-    				<appRoot>/usr/local/tomcat/webapps/ROOT</appRoot>
-				</container>
-    		</configuration>
+		        <from>
+		            <image>tomcat:9.0-jdk17</image>
+		        </from>
+		        <to>
+		            <image>us-central1-docker.pkg.dev/project-ebf6c4d4-5ed4-4a81-80d/sofe3980u/binarycalculatorwebapp</image>
+		        </to>
+		        <container>
+		            <entrypoint>
+		                <arg>catalina.sh</arg>
+		                <arg>run</arg>
+		            </entrypoint>
+		            <appRoot>/usr/local/tomcat/webapps/ROOT</appRoot>
+		        </container>
+		    </configuration>
 		</plugin>
     </plugins>
   </build>
