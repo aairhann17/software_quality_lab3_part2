@@ -10,6 +10,11 @@ metadata:
 spec:
   serviceAccountName: jenkins-sa
   containers:
+  - name: maven
+    image: maven:3.9.6-eclipse-temurin-17
+    command:
+    - cat
+    tty: true
   - name: gcloud
     image: google/cloud-sdk:latest
     command:
@@ -33,7 +38,7 @@ spec:
 
         stage('test') {
             steps {
-                container('gcloud') {
+                container('maven') {
                     sh 'mvn clean test -f ./BinaryCalculatorWebApp/pom.xml'
                 }
             }
@@ -41,7 +46,7 @@ spec:
 
         stage('build') {
             steps {
-                container('gcloud') {
+                container('maven') {
                     sh 'mvn -f ./BinaryCalculatorWebApp/pom.xml -DskipTests clean package'
                 }
             }
@@ -53,6 +58,11 @@ spec:
                     sh """
                         gcloud config set project ${project_id}
                         gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+                    """
+                }
+
+                container('maven') {
+                    sh """
                         mvn -f ./BinaryCalculatorWebApp/pom.xml jib:build
                     """
                 }
