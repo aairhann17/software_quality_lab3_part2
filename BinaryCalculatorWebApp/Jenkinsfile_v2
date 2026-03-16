@@ -20,7 +20,7 @@ spec:
     args:
     - --dockerfile=/workspace/Dockerfile
     - --context=/workspace
-    - --destination=us-central1-docker.pkg.dev/${project_id}/sofe3980u/binarycalculatorwebapp:latest
+    - --destination=dummy-placeholder
     - --single-snapshot
     volumeMounts:
     - name: workspace-volume
@@ -69,6 +69,12 @@ spec:
                 container('kaniko') {
                     sh """
                         cp -r BinaryCalculatorWebApp/* /workspace/
+
+                        /kaniko/executor \
+                          --dockerfile=/workspace/Dockerfile \
+                          --context=/workspace \
+                          --destination=us-central1-docker.pkg.dev/${project_id}/sofe3980u/binarycalculatorwebapp:latest \
+                          --single-snapshot
                     """
                 }
             }
